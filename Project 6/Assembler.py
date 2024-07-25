@@ -62,27 +62,64 @@ jump_map = {
     "JMP":  "111",
 }
 
+symbol_map = {
+    "SP":       0,
+    "LCL":      1,
+    "ARG":      2,
+    "THIS":     3,
+    "THAT":     4,
+    "SCREEN":   16384,
+    "KBD":      24576,
+}
+
+for i in range(16):
+    symbol_map[f"R{i}"] = i
+
 
 output_string = ""
 
 try:
+    # First pass to construct Symbols
     with open(args.file) as f:
+        line_count = 0
+        for line in f:
+            line = line.strip()
+            # Getting rid of empty lines and comments
+            if len(line) != 0 and line[:2] != "//":
+                if line[0] == '(' and line[-1] == ')':
+                    symbol_map[line[1:-1]] = line_count
+                else:
+                    line_count += 1
+
+    # Second pass to construct output
+    with open(args.file) as f:
+        RAM_open = 16
         for line in f:
             line = line.strip()
 
             # Getting rid of empty lines and comments
-            if len(line) != 0 and line[:2] != "//":
+            if len(line) != 0 and line[:2] != "//" and not (line[0] == '(' and line[-1] == ')'):
                 oLine = ""
 
                 # Handling A-instructions, need to include symbolic references
                 if line[0] == '@':
                     oLine += "0"
+
+                    # Simply numbers
                     if line[1:].isnumeric():
-                        tmp = "{0:b}".format(int(line[1:]))
-                        tmp = tmp.zfill(15)
-                        oLine += tmp
+                        tmp = int(line[1:])
+                    # Symbolic
                     else:
-                        oLine += '0' * 15
+                        tmp = line[1:]
+                        # Handle new symbols
+                        if tmp not in symbol_map:
+                            symbol_map[tmp] = RAM_open
+                            RAM_open += 1
+                        tmp = symbol_map[tmp]
+
+                    tmp = "{0:b}".format(tmp)
+                    tmp = tmp.zfill(15)
+                    oLine += tmp
 
                 # Handling C-Instruction
                 else:
