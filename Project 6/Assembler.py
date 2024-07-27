@@ -75,86 +75,110 @@ symbol_map = {
 for i in range(16):
     symbol_map[f"R{i}"] = i
 
+RAM_open = 16
 
-output_string = ""
 
-try:
+def check_valid_line(line):
+    return len(line) != 0 and line[:2] != "//"
+
+def check_pseudo(line):
+    return line[0] == '(' and line[-1] == ')'
+
+def first_pass(file):
+    global symbol_map
     # First pass to construct Symbols
-    with open(args.file) as f:
+    with open(file) as f:
         line_count = 0
         for line in f:
             line = line.strip()
             # Getting rid of empty lines and comments
-            if len(line) != 0 and line[:2] != "//":
-                if line[0] == '(' and line[-1] == ')':
+            if check_valid_line(line):
+                if check_pseudo(line):
                     symbol_map[line[1:-1]] = line_count
                 else:
                     line_count += 1
 
+def handle_A_string(line):
+    global RAM_open
+    oLine = "0"
+
+    # Simply numbers
+    if line[1:].isnumeric():
+        tmp = int(line[1:])
+    # Symbolic
+    else:
+        tmp = line[1:]
+        # Handle new symbols
+        if tmp not in symbol_map:
+            symbol_map[tmp] = RAM_open
+            RAM_open += 1
+        tmp = symbol_map[tmp]
+
+    tmp = "{0:b}".format(tmp)
+    tmp = tmp.zfill(15)
+    oLine += tmp
+
+    return oLine
+
+def handle_C_string(line):
+    oLine = "111"
+    comp = "null"
+    dest = "null"
+    jump = "null"
+
+    # Split by equals sign for comp and dest
+    if "=" in line:
+        dest = line.split("=")[0].strip()
+        comp = line.split("=")[1].strip()
+    else:
+        comp = line
+
+    # Split by ; for jump if present
+    if ";" in comp:
+        jump = comp.split(";")[1].strip()
+        comp = comp.split(";")[0].strip()
+    
+    if "M" in comp:
+        oLine += "1" + comp1_map[comp]
+    else:
+        oLine += "0" + comp0_map[comp]
+
+    # Possible bug in PongL.asm
+    if dest == "MD":
+        dest = "DM"
+
+    oLine += dest_map[dest]
+    oLine += jump_map[jump]
+
+    return oLine
+
+def second_pass(file):
     # Second pass to construct output
+    output_string = ""
+
     with open(args.file) as f:
-        RAM_open = 16
         for line in f:
             line = line.strip()
 
             # Getting rid of empty lines and comments
-            if len(line) != 0 and line[:2] != "//" and not (line[0] == '(' and line[-1] == ')'):
-                oLine = ""
+            if check_valid_line(line) and not check_pseudo(line):
 
                 # Handling A-instructions, need to include symbolic references
                 if line[0] == '@':
-                    oLine += "0"
-
-                    # Simply numbers
-                    if line[1:].isnumeric():
-                        tmp = int(line[1:])
-                    # Symbolic
-                    else:
-                        tmp = line[1:]
-                        # Handle new symbols
-                        if tmp not in symbol_map:
-                            symbol_map[tmp] = RAM_open
-                            RAM_open += 1
-                        tmp = symbol_map[tmp]
-
-                    tmp = "{0:b}".format(tmp)
-                    tmp = tmp.zfill(15)
-                    oLine += tmp
+                    oLine = handle_A_string(line)
 
                 # Handling C-Instruction
                 else:
-                    oLine += "111"
-                    comp = "null"
-                    dest = "null"
-                    jump = "null"
-
-                    # Split by equals sign for comp and dest
-                    if "=" in line:
-                        dest = line.split("=")[0].strip()
-                        comp = line.split("=")[1].strip()
-                    else:
-                        comp = line
-
-                    # Split by ; for jump if present
-                    if ";" in comp:
-                        jump = comp.split(";")[1].strip()
-                        comp = comp.split(";")[0].strip()
-                    
-                    if "M" in comp:
-                        oLine += "1" + comp1_map[comp]
-                    else:
-                        oLine += "0" + comp0_map[comp]
-
-                    # Possible bug in PongL.asm
-                    if dest == "MD":
-                        dest = "DM"
-
-                    oLine += dest_map[dest]
-                    oLine += jump_map[jump]
+                    handle_A_string(line)
 
                 if len(output_string) > 0:
                     output_string += '\n'
                 output_string += oLine
+
+
+try:
+    first_pass(args.file)
+    output_string = second_pass(args.file)
     with open('Prog.hack', 'w') as f:
         f.write(output_string)
 except FileNotFoundError:
