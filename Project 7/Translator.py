@@ -92,26 +92,14 @@ comp_format = adv_ops["pop_two"] + '\n' + """D={2}
     M=D""" + '\n' + common_ops["SP++"]
 
 bool_meta = {
-    "and": ["JEQ", "JNE", 'M-D'],
-    "or": ["JNE", "JEQ", 'D+M'],
+    "and": ['&'],
+    "or": ['|'],
     "not": [],
 }
 
-not_format = adv_ops["pop_one"] + '\n' + """@JumpMakeT.{0}
-    D;JNE
-    @JumpMakeF.{0}
-    D;JEQ
-    (JumpT.{0})""" + '\n' + set_true + '\n' + """@JumpEnd.{0}
-    0;JMP
-    (JumpF.{0})
-    @0
-    D=A
-    @JumpEnd.{0}
-    0;JMP
-    (JumpEnd.{0})
-    @SP
-    A=M
-    M=D""" + '\n' + common_ops["SP++"]
+bool_format = adv_ops["pop_two"] + '\n' + "M=D{0}M" + '\n' + common_ops["SP++"]
+
+not_format = adv_ops["pop_one"] + '\n' + "M=!M" + '\n' + common_ops["SP++"]
 
 pointer_push_end = f"""// RAM[SP] = D
 @SP
@@ -242,15 +230,10 @@ def translate_compare(command):
 def translate_bool(command):
     global comp_iter
     comp_iter += 1
-    if len(bool_meta[command]) == 3:
-        return comp_format.format(
-            bool_meta[command][0],
-            bool_meta[command][1],
-            bool_meta[command][2],
-            comp_iter,
-        )
+    if len(bool_meta[command]) == 1:
+        return bool_format.format(bool_meta[command][0])
     else:
-        return not_format.format(comp_iter)
+        return not_format
 
 def add_ins(parent, new_line):
     if parent is None:
