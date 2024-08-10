@@ -1,0 +1,9 @@
+class Main {
+    function void main() {
+        var JumpGame game;
+        let game = JumpGame.new();
+        do game.play();
+        do game.dispose();
+        return;
+    }
+}

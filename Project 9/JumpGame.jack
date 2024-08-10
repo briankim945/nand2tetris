@@ -1,0 +1,180 @@
+class JumpGame {
+    // The current step in the arc, the y jump-off point, the time delay between changes in y, the numbers of pipes, score
+    field int step, yStart, delay, nPipes, score;
+
+    // Hopping Square
+    field Square square;
+
+    // Pipes array
+    field Array pipes;
+    field PipeObj pipes;
+
+    constructor JumpGame new() {
+        let step = 0;
+        let yStart = 120;
+        let delay = 1000;
+        let nPipes = 4;
+        let pipes = Array.new(4);
+        let score = 0;
+
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Get key and update step and start if any key has been pressed */
+    method void checkJump(int start) {
+        if (~(Keyboard.keyPressed() = 0)) {
+            let yStart = square.calcY(step, yStart);
+            let step = 0;
+        }
+        return;
+    }
+
+    /** Erases the square from the screen. */
+    method void erase() {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(0, 0, 511, 255);
+        return;
+    }
+
+    /** Initialize pipes in array */
+    method void initPipes() {
+        var int i;
+        var PipeObj p;
+        let i = 0;
+
+        while (i < nPipes) {
+            let pipes[i] = PipeObj.new(Random.rand());
+            let p = pipes[i];
+            do p.buildPipes();
+            let i = i + 1;
+        }
+
+        let p = pipes[0];
+        do p.setInitialized(true);
+
+        return;
+    }
+
+    /** clean out and replace passed pipes */
+    method void cleanPipes() {
+        var int i;
+        var PipeObj p;
+
+        let p = pipes[0];
+
+        if (p.getPassedScreen()) {
+            let i = 0;
+            let score = score + 1;
+            while (i < (nPipes - 1)) {
+                let pipes[i] = pipes[i + 1];
+                let i = i + 1;
+            }
+            do p.dispose();
+            let pipes[i] = PipeObj.new(Random.rand());
+            let p = pipes[i];
+            do p.buildPipes();
+        }
+        
+        return;
+    }
+
+    /** Iterate through pipes */
+    method void iteratePipes() {
+        var int i;
+        var PipeObj p, pPrior;
+        let i = 0;
+
+        while (i < nPipes) {
+            let p = pipes[i];
+            if (p.getInitialized()) {
+                do p.shiftPipes();
+                do p.drawPipes();
+            } else {
+                if ((i > 0) & (pPrior.getInitialized() & (pPrior.getX() < 350))) {
+                    do p.setInitialized(true);
+                    do p.shiftPipes();
+                    do p.drawPipes();
+                }
+            }
+            let pPrior = pipes[i];
+            let i = i + 1;
+        }
+        
+        return;
+    }
+
+    /** check for collisions with pipes */
+    method boolean checkCollisions(int xIn, int yIn, int sIn) {
+        var int i;
+        var PipeObj p;
+        var boolean allClear;
+        let i = 0;
+        let allClear = true;
+
+        while (i < nPipes) {
+            let p = pipes[i];
+            let allClear = allClear & ~(p.detectCollision(xIn, yIn, sIn));
+            let i = i + 1;
+        }
+
+        return allClear;
+    }
+
+    /** dispose pipes */
+    method void disposePipes() {
+        var int i;
+        var PipeObj p;
+        let i = 0;
+
+        while (i < nPipes) {
+            let p = pipes[i];
+            do p.dispose();
+            let i = i + 1;
+        }
+
+        do pipes.dispose();
+
+        return;
+    }
+
+    /** goes through the arc */
+    method void play() {
+        var boolean cont, clearFloor, collide;
+        var char k;
+        let cont = true;
+        let clearFloor = false;
+        let collide = false;
+        let step = 0;
+        let square = Square.new();
+        do initPipes();
+
+        //do Output.printString("Press any key to begin");
+        //let k = Keyboard.readChar();
+        do Output.printString("Starting");
+
+        while (cont) {
+            do erase();
+            do checkJump(step);
+            let cont = square.iterate(step, yStart) & checkCollisions(square.getX(), square.getY(), square.getS());
+            do cleanPipes();
+            do iteratePipes();
+            let step = step + 1;
+            do Sys.wait(delay);
+        }
+
+        do square.dispose();
+        do disposePipes();
+
+        do Output.printString("Complete ");
+        do Output.printInt(score);
+        do Output.println();
+
+        return;
+    }
+}

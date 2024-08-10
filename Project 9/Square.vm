@@ -1,0 +1,131 @@
+function Square.new 0
+    push constant 6
+    call Memory.alloc 1
+    pop pointer 0
+    push constant 50
+    pop this 0
+    push constant 120
+    pop this 1
+    push constant 10
+    pop this 2
+    push constant 1
+    pop this 3
+    push constant 1000
+    pop this 4
+    push pointer 0
+    return
+function Square.dispose 0
+    push argument 0
+    pop pointer 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return
+function Square.draw 0
+    push argument 0
+    pop pointer 0
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push this 1
+    push this 0
+    push this 2
+    add
+    push this 1
+    push this 2
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push constant 0
+    return
+function Square.calcY 0
+    push argument 0
+    pop pointer 0
+    push argument 1
+    push argument 1
+    call Math.multiply 2
+    push this 3
+    call Math.multiply 2
+    push this 3
+    call Math.multiply 2
+    push constant 5
+    push argument 1
+    call Math.multiply 2
+    push this 3
+    call Math.multiply 2
+    sub
+    push argument 2
+    add
+    return
+function Square.getX 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    return
+function Square.getY 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    return
+function Square.getS 0
+    push argument 0
+    pop pointer 0
+    push this 2
+    return
+function Square.iterate 0
+    push argument 0
+    pop pointer 0
+    push pointer 0
+    push argument 1
+    push argument 2
+    call Square.calcY 3
+    pop this 1
+    push this 1
+    push constant 255
+    push this 2
+    sub
+    lt
+    push this 0
+    push constant 511
+    push this 2
+    sub
+    lt
+    and
+    not
+    if-goto L1
+    push this 1
+    push constant 0
+    gt
+    push this 1
+    push constant 0
+    eq
+    or
+    push this 0
+    push constant 0
+    gt
+    push this 0
+    push constant 0
+    eq
+    or
+    and
+    not
+    if-goto L3
+    push pointer 0
+    call Square.draw 1
+    pop temp 0
+    push constant 1
+    neg
+    return
+    goto L2
+label L3
+    push constant 0
+    return
+label L2
+    goto L0
+label L1
+    push constant 0
+    return
+label L0

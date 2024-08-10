@@ -1,0 +1,76 @@
+class Square {
+    // position of square
+    field int x, y;
+
+    // size of square
+    field int s;
+
+    // distance traveled on x-axis and y-axis by square
+    field int yDist;
+
+    // ms delay between jumps
+    field int delay;
+
+    // whether or not an arc has been completed
+    field boolean complete;
+
+    // constructor
+    constructor Square new() {
+        let x = 50;
+        let y = 120;
+        let s = 10;
+        let yDist = 1;
+        let delay = 1000;
+
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    // draws square
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x, y, x + s, y + s);
+        return;
+    }
+
+    /** Calculate present y */
+    method int calcY(int step, int start) {
+        return (step * step * yDist * yDist) - (5 * step * yDist) + start;
+    }
+
+    /** get x */
+    method int getX() {
+        return x;
+    }
+
+    /** get y */
+    method int getY() {
+        return y;
+    }
+
+    /** get s */
+    method int getS() {
+        return s;
+    }
+
+    /** Takes another point in the arc */
+    method void iterate(int step, int start) {
+        let y = calcY(step, start);
+        if ((y < (255 - s)) & (x < (511 - s))) {
+            if (((y > 0) | (y = 0)) & ((x > 0) | (x = 0))) {
+                do draw();
+                return true;
+            }
+            else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+}

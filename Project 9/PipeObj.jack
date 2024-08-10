@@ -1,0 +1,105 @@
+class PipeObj {
+    // width of pipes, top value of lower pipe, bottom value of upper pipe, random seed, x, constant variables
+    field int width, maxWidth, bottom, top, seed, x, pipeMargin, pipeSpace, screenTop, screenRight;
+
+    // indicating to the game if the pipe has been drawn and started moving yet, indicating if it is past the screen
+    field boolean initialized;
+
+    constructor PipeObj new(int seedIn) {
+        let x = 510;
+        let seed = seedIn;
+        let width = 1;
+        let maxWidth = 50;
+        let initialized = false;
+        let pipeMargin = 25;
+        let pipeSpace = 70;
+        let screenTop = 255;
+        let screenRight = 511;
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Return initalized */
+    method boolean getInitialized() {
+        return initialized;
+    }
+
+    /** Return passedScreen */
+    method boolean getPassedScreen() {
+        return ((x < 1) & (width < 2));
+    }
+
+    /** Return x */
+    method int getX() {
+        return x;
+    }
+
+    /** set initalized */
+    method void setInitialized(boolean b) {
+        let initialized = b;
+        return;
+    }
+
+    /** gets a random starting point and constructs the pipes */
+    method void buildPipes() {
+        let bottom = Random.randRange(screenTop - pipeMargin - pipeMargin - pipeSpace);
+        let top = bottom + 50;
+        do Output.printInt(bottom);
+        return;
+    }
+
+    /** move pipes left */
+    method void shiftPipes() {
+        if (x > 0) {
+            if (width < 50) {
+                let width = width + 1;
+            }
+            let x = x - 1;
+        }
+        else {
+            let width = width - 1;
+        }
+        return;
+    }
+    
+    /** draws pipes based on bottom and top */
+    method void drawPipes() {
+        if (width > 0) {
+            do Screen.setColor(true);
+            // Bottom pipe
+            do Screen.drawRectangle(x, 0, x + width, bottom + pipeMargin);
+            // Top pipe
+            do Screen.drawRectangle(x, bottom + pipeMargin + pipeSpace, x + width, screenTop);
+        }
+        return;
+    }
+
+    /** detect collision */
+    method boolean detectCollision(int xIn, int yIn, int sIn) {
+        if ((yIn + sIn) > (bottom + pipeMargin + pipeSpace)) {
+            if (((xIn > x) & (xIn < (x + width))) | ((xIn + sIn) > x) & ((xIn + sIn) < (x + width))) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            if (yIn < (bottom + pipeMargin)) {
+                if (((xIn > x) & (xIn < (x + width))) | ((xIn + sIn) > x) & ((xIn + sIn) < (x + width))) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+    }
+}
