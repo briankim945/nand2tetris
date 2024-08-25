@@ -28,6 +28,7 @@ class VMWriter:
             self.writeClean(f"{self.tab}call {math_calls[command][0]} {math_calls[command][1]}")
 
     def writePush(self, segment: str, index: int):
+        # if segment.lower() != "none":
         self.writeClean(self.tab + f"push {segment.lower()} {index}")
 
     def writePop(self, segment: str, index: int):

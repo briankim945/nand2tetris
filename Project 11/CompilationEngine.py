@@ -281,6 +281,7 @@ class CompilationEngine:
             if self.jktk.tokenType() == "SYMBOL" and self.jktk.symbol(internal=False) in terminator:
                 break
             op = self.jktk.symbol(internal=False)
+            assert op in operators, op
             self.jktk.advance()
             self.compileTerm()
             self.vmWriter.writeArithmetic(op)
@@ -351,11 +352,13 @@ class CompilationEngine:
                 assert self.jktk.symbol() == "("
                 nArgs += self.compileExpressionList(terminator=[")"])
                 self.vmWriter.writeCall(tmp, nArgs)
+                self.jktk.advance()
             elif self.jktk.symbol() == "(":
                 nArgs = 1
                 self.vmWriter.writePush("pointer", 0)
                 nArgs += self.compileExpressionList(terminator=[")"])
                 self.vmWriter.writeCall(f"{self.className}.{tmp}", nArgs)
+                self.jktk.advance()
             elif token == "INT_CONST":
                 self.vmWriter.writePush("constant", int(tmp))
             else:
@@ -369,11 +372,18 @@ class CompilationEngine:
                 if self.jktk.tokenType() == "SYMBOL" and self.jktk.symbol(internal=False) in terminator:
                     break
                 self.compileExpression(terminator=[',', ')'])
+                assert self.jktk.symbol(internal=False) in [',', ')'], self.jktk.symbol(internal=False)
                 count += 1
         return count
 
     def getSymbolData(self, varName):
+        k = None
+        i = None
         if self.classSymbolTable.indexOf(varName) != -1:
-            return self.classSymbolTable.kindOf(varName), self.classSymbolTable.indexOf(varName)
+            k = self.classSymbolTable.kindOf(varName)
+            i = self.classSymbolTable.indexOf(varName)
         else:
-            return self.functionSymbolTable.kindOf(varName), self.functionSymbolTable.indexOf(varName)
+            k = self.functionSymbolTable.kindOf(varName)
+            i = self.functionSymbolTable.indexOf(varName)
+        assert i >= 0, f"{varName} {i} {self.classSymbolTable.table} {self.functionSymbolTable.table}"
+        return k, i

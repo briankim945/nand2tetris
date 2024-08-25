@@ -26,10 +26,6 @@ class JackTokenizer:
                         if t == '/' and i > 0 and l[i - 1] == '*':
                             multiline_commenting = False
                     else:
-                        if cur_token.isnumeric() and not t.isnumeric():
-                            new_tokens.append(cur_token)
-                            cur_token = ""
-
                         if t == '/' and i < len(l) - 1 and l[i + 1] == '/':
                             break
                         elif t == '/' and i < len(l) - 2 and l[i + 1:i + 3] == '**':
@@ -43,22 +39,27 @@ class JackTokenizer:
                                 string_process = True
                         elif string_process:
                             cur_token += t
-                        elif t.isspace():
-                            if len(cur_token) > 0:
-                                new_tokens.append(cur_token)
-                                cur_token = ""
-                        elif (len(cur_token) == 0 or cur_token.isnumeric()) and t.isnumeric():
-                            cur_token += t
-                        elif not self.identifierRegex.match(t):
-                            if len(cur_token) > 0:
-                                new_tokens.append(cur_token)
-                                cur_token = ""
-                            if t in unary_rev and i < len(l) - 1 and (self.identifierRegex.match(l[i + 1]) or l[i + 1].isnumeric() or l[i + 1] == '('):
-                                new_tokens.append(unary_rev[t])
-                            else:
-                                new_tokens.append(t)
                         else:
-                            cur_token += t
+                            if cur_token.isnumeric() and not t.isnumeric():
+                                new_tokens.append(cur_token)
+                                cur_token = ""
+
+                            if t.isspace():
+                                if len(cur_token) > 0:
+                                    new_tokens.append(cur_token)
+                                    cur_token = ""
+                            elif (len(cur_token) == 0 or cur_token.isnumeric()) and t.isnumeric():
+                                cur_token += t
+                            elif not self.identifierRegex.match(t):
+                                if len(cur_token) > 0:
+                                    new_tokens.append(cur_token)
+                                    cur_token = ""
+                                if t in unary_rev and i < len(l) - 1 and (self.identifierRegex.match(l[i + 1]) or l[i + 1].isnumeric() or l[i + 1] == '('):
+                                    new_tokens.append(unary_rev[t])
+                                else:
+                                    new_tokens.append(t)
+                            else:
+                                cur_token += t
 
                 self.tokens.extend(new_tokens)
 
