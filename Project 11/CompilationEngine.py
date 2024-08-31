@@ -272,21 +272,20 @@ class CompilationEngine:
         self.vmWriter.writeReturn()
 
     def compileExpression(self, terminator=None):
-        while not (self.jktk.tokenType() == "SYMBOL" and self.jktk.symbol(internal=False) in terminator):
+        if not (self.jktk.tokenType() == "SYMBOL" and self.jktk.symbol(internal=False) in terminator):
             self.compileTerm()
-            if self.jktk.tokenType() == "SYMBOL" and self.jktk.symbol(internal=False) in terminator:
-                break
-            elif not (self.jktk.tokenType() == "SYMBOL" and self.jktk.symbol(internal=False) in operators):
+            while not (self.jktk.tokenType() == "SYMBOL" and self.jktk.symbol(internal=False) in terminator):
+                if self.jktk.tokenType() == "SYMBOL" and self.jktk.symbol(internal=False) in terminator:
+                    break
+                elif not (self.jktk.tokenType() == "SYMBOL" and self.jktk.symbol(internal=False) in operators):
+                    self.jktk.advance()
+                if self.jktk.tokenType() == "SYMBOL" and self.jktk.symbol(internal=False) in terminator:
+                    break
+                op = self.jktk.symbol(internal=False)
+                assert op in operators, op
                 self.jktk.advance()
-            if self.jktk.tokenType() == "SYMBOL" and self.jktk.symbol(internal=False) in terminator:
-                break
-            op = self.jktk.symbol(internal=False)
-            assert op in operators, op
-            self.jktk.advance()
-            self.compileTerm()
-            self.vmWriter.writeArithmetic(op)
-            if not (self.jktk.tokenType() == "SYMBOL" and self.jktk.symbol(internal=False) in terminator):
-                self.jktk.advance()
+                self.compileTerm()
+                self.vmWriter.writeArithmetic(op)
 
     def compileTerm(self, terminator=None):
         if self.jktk.symbol() == "(":
