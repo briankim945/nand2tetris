@@ -1,0 +1,466 @@
+// Compiled Main.jack:
+function Main.main 1
+    push constant 8000
+    pop local 0
+    push constant 0
+    push local 0
+    add
+    push constant 2
+    push constant 3
+    call Math.multiply 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 1
+    push local 0
+    add
+    push constant 0
+    push local 0
+    add
+    pop pointer 1
+    push that 0
+    push constant 30
+    neg
+    call Math.multiply 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 2
+    push local 0
+    add
+    push constant 1
+    push local 0
+    add
+    pop pointer 1
+    push that 0
+    push constant 100
+    call Math.multiply 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 3
+    push local 0
+    add
+    push constant 1
+    push constant 2
+    push local 0
+    add
+    pop pointer 1
+    push that 0
+    call Math.multiply 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 4
+    push local 0
+    add
+    push constant 3
+    push local 0
+    add
+    pop pointer 1
+    push that 0
+    push constant 0
+    call Math.multiply 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 5
+    push local 0
+    add
+    push constant 9
+    push constant 3
+    call Math.divide 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 6
+    push local 0
+    add
+    push constant 18000
+    neg
+    push constant 6
+    call Math.divide 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 7
+    push local 0
+    add
+    push constant 32766
+    push constant 32767
+    neg
+    call Math.divide 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 8
+    push local 0
+    add
+    push constant 9
+    call Math.sqrt 1
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 9
+    push local 0
+    add
+    push constant 32767
+    call Math.sqrt 1
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 10
+    push local 0
+    add
+    push constant 345
+    push constant 123
+    call Math.min 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 11
+    push local 0
+    add
+    push constant 123
+    push constant 345
+    neg
+    call Math.max 2
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 12
+    push local 0
+    add
+    push constant 27
+    call Math.abs 1
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 13
+    push local 0
+    add
+    push constant 32767
+    neg
+    call Math.abs 1
+    pop temp 0
+    pop pointer 1
+    push temp 0
+    pop that 0
+    push constant 0
+    return
+// Compiled Math.jack:
+function Math.init 2
+    push constant 0
+    return
+function Math.abs 1
+    push argument 0
+    push constant 0
+    lt
+    not
+    if-goto L1
+    push argument 0
+    neg
+    pop local 0
+    goto L0
+label L1
+    push argument 0
+    pop local 0
+label L0
+    push local 0
+    return
+function Math.multiply 6
+    push argument 0
+    push constant 0
+    lt
+    push argument 1
+    push constant 0
+    gt
+    and
+    push argument 0
+    push constant 0
+    gt
+    push argument 1
+    push constant 0
+    lt
+    and
+    or
+    not
+    if-goto L3
+    push constant 1
+    neg
+    pop local 5
+    goto L2
+label L3
+    push constant 0
+    pop local 5
+label L2
+    push argument 0
+    call Math.abs 1
+    pop argument 0
+    push argument 1
+    call Math.abs 1
+    pop argument 1
+    push constant 0
+    pop local 0
+    push argument 0
+    pop local 1
+    push constant 0
+    pop local 2
+    push constant 1
+    pop local 4
+label L4
+    push local 2
+    push constant 15
+    lt
+    not
+    if-goto L5
+    push argument 1
+    push local 4
+    and
+    push constant 0
+    gt
+    not
+    if-goto L7
+    push local 0
+    push local 1
+    add
+    pop local 0
+    goto L6
+label L7
+label L6
+    push local 1
+    push local 1
+    add
+    pop local 1
+    push local 2
+    push constant 1
+    add
+    pop local 2
+    push local 4
+    push local 4
+    add
+    pop local 4
+    goto L4
+label L5
+    push local 5
+    not
+    if-goto L9
+    push local 0
+    neg
+    pop local 0
+    goto L8
+label L9
+label L8
+    push local 0
+    return
+function Math.divide 3
+    push argument 0
+    push constant 0
+    lt
+    push argument 1
+    push constant 0
+    gt
+    and
+    push argument 0
+    push constant 0
+    gt
+    push argument 1
+    push constant 0
+    lt
+    and
+    or
+    not
+    if-goto L11
+    push constant 1
+    neg
+    pop local 2
+    goto L10
+label L11
+    push constant 0
+    pop local 2
+label L10
+    push argument 0
+    call Math.abs 1
+    pop argument 0
+    push argument 1
+    call Math.abs 1
+    pop argument 1
+    push argument 1
+    push argument 0
+    gt
+    not
+    if-goto L13
+    push constant 0
+    pop local 0
+    goto L12
+label L13
+    push argument 1
+    push constant 16383
+    gt
+    not
+    if-goto L15
+    push constant 0
+    pop local 0
+    goto L14
+label L15
+    push argument 0
+    push constant 2
+    push argument 1
+    call Math.multiply 2
+    call Math.divide 2
+    push constant 2
+    call Math.multiply 2
+    pop local 0
+label L14
+    push argument 0
+    push local 0
+    push argument 1
+    call Math.multiply 2
+    sub
+    push argument 1
+    lt
+    not
+    if-goto L17
+    push local 0
+    pop local 1
+    goto L16
+label L17
+    push local 0
+    push constant 1
+    add
+    pop local 1
+label L16
+label L12
+    push local 2
+    push local 1
+    push constant 0
+    gt
+    and
+    not
+    if-goto L19
+    push local 1
+    neg
+    pop local 1
+    goto L18
+label L19
+label L18
+    push local 1
+    return
+function Math.pow 2
+    push argument 1
+    pop local 1
+    push constant 1
+    pop local 0
+label L20
+    push local 1
+    push constant 0
+    gt
+    not
+    if-goto L21
+    push local 0
+    push argument 0
+    call Math.multiply 2
+    pop local 0
+    push local 1
+    push constant 1
+    sub
+    pop local 1
+    goto L20
+label L21
+    push local 0
+    return
+function Math.sqrt 3
+    push constant 0
+    pop local 0
+    push constant 7
+    pop local 1
+label L22
+    push local 1
+    push constant 1
+    neg
+    gt
+    not
+    if-goto L23
+    push local 0
+    push constant 2
+    push local 1
+    call Math.pow 2
+    add
+    pop local 2
+    push local 2
+    push local 2
+    call Math.multiply 2
+    pop local 2
+    push local 2
+    push argument 0
+    lt
+    push local 2
+    push argument 0
+    eq
+    or
+    push local 2
+    push constant 0
+    gt
+    and
+    not
+    if-goto L25
+    push local 0
+    push constant 2
+    push local 1
+    call Math.pow 2
+    add
+    pop local 0
+    goto L24
+label L25
+label L24
+    push local 1
+    push constant 1
+    sub
+    pop local 1
+    goto L22
+label L23
+    push local 0
+    return
+function Math.max 1
+    push argument 0
+    push argument 1
+    gt
+    not
+    if-goto L27
+    push argument 0
+    pop local 0
+    goto L26
+label L27
+    push argument 1
+    pop local 0
+label L26
+    push local 0
+    return
+function Math.min 1
+    push argument 0
+    push argument 1
+    lt
+    not
+    if-goto L29
+    push argument 0
+    pop local 0
+    goto L28
+label L29
+    push argument 1
+    pop local 0
+label L28
+    push local 0
+    return

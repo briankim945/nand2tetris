@@ -1,0 +1,104 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+ * This library provides two services: direct access to the computer's main
+ * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
+ * consists of 32,768 words, each holding a 16-bit binary number.
+ */ 
+class Memory {
+    static Array ram, heap, freeList;
+    static int cutoff;
+
+    /** Initializes the class. */
+    function void init() {
+        let ram = 0;
+        let heap = 2048;
+        let freeList = heap;
+        let heap[0] = 0;
+        let heap[1] = 14334;
+        let heap[2] = 14334;
+        let cutoff = 14334;
+        return;
+    }
+
+    /** Returns the RAM value at the given address. */
+    function int peek(int address) {
+        return ram[address];
+    }
+
+    /** Sets the RAM value at the given address to the given value. */
+    function void poke(int address, int value) {
+        let ram[address] = value;
+        return;
+    }
+
+    /** Finds an available RAM block of the given size and returns
+     *  a reference to its base address. */
+    function int alloc(int size) {
+        var Array curBlock, prevBlock, bestBlock, beforeBest;
+        var int curSize, bestSize;
+
+        let size = size + 2;
+
+        let curBlock = freeList;
+        
+        while ((curBlock[1] < size) & (curBlock < cutoff)) {
+            let beforeBest = prevBlock;
+            let prevBlock = curBlock;
+            let curBlock = curBlock[2];
+        }
+
+        let bestBlock = curBlock;
+        let bestSize = curBlock[1];
+
+        while (curBlock < cutoff) {
+            if (((curBlock[1] > size) | (curBlock[1] = size)) & (curBlock[1] < bestSize)) {
+                let beforeBest = prevBlock;
+                let bestBlock = curBlock;
+                let bestSize = curBlock[1];
+            }
+            let prevBlock = curBlock;
+            let curBlock = curBlock[2];
+        }
+
+        if (bestBlock = freeList) {
+            let freeList = freeList[2];
+            let freeList[1] = bestBlock[1] - size;
+            let freeList[2] = bestBlock[2];
+        }
+        else {
+            let beforeBest[1] = beforeBest[1] - size;
+            let beforeBest[2] = curBlock;
+        }
+
+        return bestBlock;
+    }
+
+    /** De-allocates the given object (cast as an array) by making
+     *  it available for future allocations. */
+    function void deAlloc(Array o) {
+        var Array curBlock, prevBlock;
+
+        let curBlock = freeList;
+
+        while (curBlock < o) {
+            let prevBlock = curBlock;
+            let curBlock = curBlock[2];
+        }
+
+        if (curBlock = freeList) {
+            let prevBlock = freeList;
+            let freeList = curBlock;
+            let curBlock[2] = prevBlock;
+        }
+        else {
+            let prevBlock[2] = curBlock;
+            let curBlock[2] = prevBlock[2];
+        }
+
+        return;
+    }    
+}

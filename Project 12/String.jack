@@ -1,0 +1,142 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/String.jack
+
+/**
+ * Represents character strings. In addition for constructing and disposing
+ * strings, the class features methods for getting and setting individual
+ * characters of the string, for erasing the string's last character,
+ * for appending a character to the string's end, and more typical
+ * string-oriented operations.
+ */
+class String {
+    field Array a;
+    field int fMaxLength, fCurLength;
+
+    /** constructs a new empty string with a maximum length of maxLength
+     *  and initial length of 0. */
+    constructor String new(int maxLength) {
+        if (maxLength > 0) {
+            let a = Array.new(maxLength);
+        }
+        let fMaxLength = maxLength + 1;
+        let fCurLength = 0;
+        return this;
+    }
+
+    /** Disposes this string. */
+    method void dispose() {
+        if (~(a = null)) {
+            do a.dispose();
+            let fMaxLength = 0;
+            let fCurLength = 0;
+        }
+        return;
+    }
+
+    /** Returns the current length of this string. */
+    method int length() {
+        return fCurLength;
+    }
+
+    /** Returns the character at the j-th location of this string. */
+    method char charAt(int j) {
+        return a[j];
+    }
+
+    /** Sets the character at the j-th location of this string to c. */
+    method void setCharAt(int j, char c) {
+        if ((j > -1) & (j < fMaxLength)) {
+            let a[j] = c;
+        }
+        return;
+    }
+
+    /** Appends c to this string's end and returns this string. */
+    method String appendChar(char c) {
+        if (fCurLength < fMaxLength) {
+            let a[fCurLength] = c;
+            let fCurLength = fCurLength + 1;
+        }
+        return this;
+    }
+
+    /** Erases the last character from this string. */
+    method void eraseLastChar() {
+        if (fCurLength > 0) {
+            let fCurLength = fCurLength - 1;
+        }
+        return;
+    }
+
+    /** Returns the integer value of this string, 
+     *  until a non-digit character is detected. */
+    method int intValue() {
+        var int value, i;
+
+        let value = 0;
+        let i = 0;
+        while ((i < fCurLength) & (((a[i] > 47) & (a[i] < 58)) | (a[i] = 45))) {
+            let value = (value * 10) + (a[i] - 48);
+            let i = i + 1;
+        }
+        return value;
+    }
+
+    /** Sets this string to hold a representation of the given value. */
+    method void setInt(int val) {
+        var int lastDigit, curVal, i;
+        var String s;
+        var char c;
+        var boolean negate;
+
+        let fCurLength = 0;
+
+        if (val < 0) {
+            let negate = true;
+            let val = Math.abs(val);
+        }
+        else {
+            let negate = false;
+        }
+
+        let curVal = val;
+
+        if (curVal < 10) {
+            do appendChar(48 + curVal);
+        }
+        else {
+            let lastDigit = curVal - ((curVal / 10) * 10);
+            do setInt(curVal / 10);
+            do appendChar(48 + lastDigit);
+        }
+
+        if (negate) {
+            let lastDigit = fCurLength + 1;
+            while (lastDigit > 0) {
+                let a[lastDigit] = a[lastDigit - 1];
+                let lastDigit = lastDigit - 1;
+            }
+            let a[0] = 45;
+            let fCurLength = fCurLength + 1;
+        }
+
+        return;
+    }
+
+    /** Returns the new line character. */
+    function char newLine() {
+        return 129;
+    }
+
+    /** Returns the backspace character. */
+    function char backSpace() {
+        return 128;
+    }
+
+    /** Returns the double quote (") character. */
+    function char doubleQuote() {
+        return 34;
+    }
+}
